@@ -69,9 +69,3 @@ O objetivo deste teste é desenvolver uma **API Rest** para o cadastro de client
 
 
 Boa sorte! 🚀
-
-
-
-**comandos**
-php artisan mysql:criar-base-mysql-projeto
-php artisan migrate:install
