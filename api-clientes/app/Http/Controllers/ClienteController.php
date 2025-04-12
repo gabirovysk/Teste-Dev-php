@@ -2,70 +2,56 @@
 
 namespace App\Http\Controllers;
 
-use App\Service\ClienteService;
+use App\Http\Requests\ClienteStoreRequest;
+use App\Http\Requests\ClienteUpdateRequest;
+use App\Models\Cliente;
+use App\Services\ClienteService;
 use Illuminate\Http\Request;
 
 class ClienteController extends Controller
 {
 
-    public function __construct(public ClienteService $service_cliente)
+    public function __construct(public ClienteService $serviceCliente)
     {
         
     }
 
     /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(ClienteStoreRequest $request, Cliente $clienteModel)
     {
-        //
+
+        $response = $this->serviceCliente->store($request, $clienteModel);
+        return $response;
+
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Cliente $clienteModel, int $id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+        $response = $this->serviceCliente->show($clienteModel, $id);
+        return $response;
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(ClienteUpdateRequest $request,Cliente $clienteModel ,int $id)
     {
-        //
+
+        $response = $this->serviceCliente->update($request, $clienteModel, $id);
+        return $response;
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Cliente $clienteModel ,int $id)
     {
-        //
+        $response = $this->serviceCliente->destroy($clienteModel, $id);
+        return $response;
     }
 }

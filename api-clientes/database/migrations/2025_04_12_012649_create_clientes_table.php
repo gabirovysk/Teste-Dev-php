@@ -1,5 +1,6 @@
 <?php
 
+use Database\Seeders\ClienteSeeder;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,14 +13,14 @@ return new class extends Migration
     public function up(): void
     {
 
-        if (Schema::hasTable('clientes')) {
+        if (!Schema::hasTable('clientes')) {
 
             Schema::create('clientes', function (Blueprint $table) {
                 $table->id();
                 $table->string('nome', 250);
-                $table->integer('cpf', 11)->unique();
-                $table->string('email', 250)->unique();
-                $table->integer('cep', 8)->unique();
+                $table->string('cpf',11);
+                $table->string('email', 250);
+                $table->string('cep',8);
                 $table->string('endereco');
                 $table->timestamps();
             });
