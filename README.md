@@ -75,5 +75,3 @@ Boa sorte! 🚀
 **comandos**
 php artisan mysql:criar-base-mysql-projeto
 php artisan migrate:install
-php artisan migrate
-php artisan db:seed --class=ClienteSeeder
