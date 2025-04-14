@@ -6,6 +6,8 @@ use App\Http\Resources\ClienteResource;
 use App\Models\Cliente;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Validation\ValidationException;
 
 class ClienteService
 {
@@ -22,9 +24,14 @@ class ClienteService
             $clienteModel->email = $request->email;
             $clienteModel->cpf = $request->cpf;
             $clienteModel->cep = $request->cep;
-            $clienteModel->endereco = 'fazer consulta';
-            $clienteModel->save();
+            $enderecoArray = $this->consultarClienteCep($request->cep);
 
+            $enderecoArray['numero'] = $request->numeroEndereco;
+            $enderecoVerificado = $this->verificarERetornarEnderecoCorretoParaSalvar($enderecoArray, null);
+            if ($enderecoVerificado['diferente'] == true) {
+                $clienteModel->endereco = $enderecoVerificado['endereco'];
+            }
+            $clienteModel->save();
   
             return ['success' => 'Dados inseridos com sucesso!'];
         } catch (Exception $e) {
@@ -34,14 +41,29 @@ class ClienteService
 
     public function update(Request $request, Cliente $clienteModel, int $id) 
     {
+        //dd($request);
         try {
             $cliente = $clienteModel->find($id);
-            (empty($request->nome) || $request->nome == NULL) ?: $cliente->nome = $request->nome;
-            (empty($request->email) || $request->email != NULL) ?: $cliente->email = $request->email;
-            (empty($request->cpf) || $request->cpf != NULL) ?: $cliente->cpf = $request->cpf;
-            (empty($request->cep) || $request->cep != NULL) ?: $cliente->cep = $request->cep;
+            if($cliente == NULL){
+                throw ValidationException::withMessages(['cliente' => 'Cliente Não encontrado!']);
+            }
+            (empty($request->nome) || $request->nome == NULL) ?: 
+            $cliente->nome = $request->nome;
+            (empty($request->email) || $request->email == NULL) ?: $cliente->email = $request->email;
+            (empty($request->cpf) || $request->cpf == NULL) ?: $cliente->cpf = $request->cpf;
 
-            $cliente->endereco = 'fazer consulta';
+            if (!empty($request->cep) || $request->cep != NULL) {
+                $cliente->cep = $request->cep;
+
+                $enderecoArray = $this->consultarClienteCep($request->cep);
+            
+                $enderecoArray['numero'] = $request->numeroEndereco;
+                $enderecoVerificado = $this->verificarERetornarEnderecoCorretoParaSalvar($enderecoArray, null);
+                if ($enderecoVerificado['diferente'] == true) {
+                    $cliente->endereco = $enderecoVerificado['endereco'];
+                }
+            }
+
             $cliente->save();
             
             return ['success' => 'Dados atualizados com sucesso!'];
@@ -67,6 +89,34 @@ class ClienteService
         } catch (Exception $e) {
             return ['error' => $e->getMessage()];
         }  
+    }
+
+    //consulta o cep do cliente
+    public function consultarClienteCep (string $cep) 
+    {
+        $response = Http::withOptions(['verify' => false])->get('https://brasilapi.com.br/api/cep/v2/'.$cep)->json();
+        if(!empty($response['type'])){
+            throw ValidationException::withMessages(['cep' => 'O cep está incorreto!']);
+        }
+        return $response;
+
+    }
+
+    public function verificarERetornarEnderecoCorretoParaSalvar (array $endArray, ?string $endAtual) 
+    {
+        $endFormatado = "{$endArray['street']} {$endArray['numero']}, {$endArray['neighborhood']} - {$endArray['city']}/{$endArray['state']}";
+
+        if ($endFormatado === $endAtual) {
+            return [
+                'diferente' => false,
+                'endereco' =>''
+            ];
+        } else {
+            return [
+                'diferente' => true,
+                'endereco' => $endFormatado
+            ];
+        }
     }
 
 

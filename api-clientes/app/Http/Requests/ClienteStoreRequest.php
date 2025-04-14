@@ -22,13 +22,12 @@ class ClienteStoreRequest extends FormRequest
     public function rules(): array
     {
 
-        $cliente = $this->route('cliente');
-
         return [
             'nome' => 'required|max:250',
-            'cpf' => 'required|max:11|unique:clientes,cpf,'.$cliente->id,
-            'email' => 'required|max:250|email:rfc,dns|unique:clientes,email,'.$cliente->id,
-            'cep' => 'required|max:8'
+            'cpf' => 'required|min:11|max:11|unique:clientes,cpf',
+            'email' => 'required|max:250|email:rfc,dns|unique:clientes,email',
+            "numeroEndereco"=>"required|max:10000|integer",
+            'cep' => 'required|min:8|max:8'
         ];
     }
 }

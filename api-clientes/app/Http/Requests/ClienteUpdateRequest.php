@@ -21,14 +21,11 @@ class ClienteUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-
-        $cliente_id = $this->route('cliente');
-
         return [
             'nome' => 'max:250',
-            'cpf' => 'max:11|unique:clientes,cpf,'.($cliente_id ? $cliente_id->id : NULL),
-            'email' => 'max:250|email:rfc,dns|unique:clientes,email,'.($cliente_id ? $cliente_id->id : NULL),
-            'cep' => 'max:8'
+            'cpf' => 'min:11max:11|unique:clientes,cpf',
+            'email' => 'max:250|email:rfc,dns|unique:clientes,email',
+            'cep' => 'min:8|max:8'
         ];
     }
 }
