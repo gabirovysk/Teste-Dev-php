@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::controller(ClienteController::class)
         ->prefix('clientes')->group(function () {
+            Route::get('/paginate', 'paginate');
             Route::get('/{id}', 'show');
             Route::post('/', 'store');
             Route::put('/{id}', 'update');

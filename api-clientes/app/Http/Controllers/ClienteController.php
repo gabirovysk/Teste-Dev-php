@@ -32,6 +32,7 @@ class ClienteController extends Controller
      */
     public function show(Cliente $clienteModel, int $id)
     {
+        dd('?');
         $response = $this->serviceCliente->show($clienteModel, $id);
         return $response;
     }
@@ -52,6 +53,12 @@ class ClienteController extends Controller
     public function destroy(Cliente $clienteModel ,int $id)
     {
         $response = $this->serviceCliente->destroy($clienteModel, $id);
+        return $response;
+    }
+
+    public function paginate (Cliente $clienteModel, Request $request)
+    {
+        $response = $this->serviceCliente->paginate($clienteModel, $request);
         return $response;
     }
 }

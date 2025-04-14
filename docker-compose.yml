@@ -21,6 +21,10 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: true
       SERVICE_TAGS: dev
       SERVICE_NAME: mysql
+    healthcheck:
+      test: "mysql -uroot  -e 'select 1'"
+      interval: 1s
+      retries: 120
     networks:
       - apiback
 
@@ -29,10 +33,14 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: php
+    depends_on:
+      mysql:
+        condition: service_healthy
     entrypoint: ['/bin/sh', '-c']
     command:
       - |
         composer install
+        php artisan key:generate
         php artisan mysql:criar-base-mysql-projeto
         php artisan migrate:install
         php artisan migrate

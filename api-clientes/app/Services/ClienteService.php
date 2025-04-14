@@ -95,7 +95,11 @@ class ClienteService
     public function consultarClienteCep (string $cep) 
     {
         $response = Http::withOptions(['verify' => false])->get('https://brasilapi.com.br/api/cep/v2/'.$cep)->json();
-        if(!empty($response['type'])){
+
+        if(empty($response)|| $response == null) {
+            throw ValidationException::withMessages(['cep' => 'O cep está incorreto.']);
+        }
+        if(!empty($response['type'] )){
             throw ValidationException::withMessages(['cep' => 'O cep está incorreto!']);
         }
         return $response;
@@ -117,6 +121,26 @@ class ClienteService
                 'endereco' => $endFormatado
             ];
         }
+    }
+
+    public function paginate (Cliente $clienteModel, Request $request) 
+    {
+        if( (empty($request->perPage)|| $request->perPage == null) || (empty($request->page)|| $request->page == null)  ) {
+            throw ValidationException::withMessages(['paginacao' => 'Envie os parametros page e perPage preenchidos.']);
+        }
+
+        if (!empty($request->cpf)|| $request->cpf != null) {
+            $clienteModel= $clienteModel->where('cpf','=',$request->cpf);
+        }
+        if (!empty($request->nome)|| $request->nome != null) {
+            $clienteModel= $clienteModel->where('nome','like','%'.$request->nome.'%');
+        }
+        if (!empty($request->cep)|| $request->cep != null) {
+            $clienteModel= $clienteModel->where('cep','=',$request->cep);
+        }
+
+        return $clienteModel->simplePaginate($request->perPage);
+
     }
 
 
